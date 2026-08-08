@@ -37,11 +37,15 @@ subroutine init_fft
     ptr4 = fftw_alloc_real(int(Nx * Ny * Nz, C_SIZE_T))
     call c_f_pointer(ptr4, rhs_poisson, [Nx,Ny,Nz])
 
-    ! 2D real to complex plan:  double(Nx,1) ---> complex(Nx/2+1, 1)
-    fftw_plan_fwd = fftw_plan_dft_r2c_2d(Nx,Ny, rhs_poisson(:,:,1), rhs_hat(:,:,1), FFTW_ESTIMATE)
+    ! ! 2D real to complex plan:  double(Nx,1) ---> complex(Nx/2+1, 1)
+    ! fftw_plan_fwd = fftw_plan_dft_r2c_2d(Nx,Ny, rhs_poisson(:,:,1), rhs_hat(:,:,1), FFTW_ESTIMATE)
 
-    ! 2D complex to real transform: complex(Nx/2+1, 1) ----> double(Nx,1)
-    fftw_plan_bwd = fftw_plan_dft_c2r_2d(Nx,Ny, rhs_hat(:,:,1), soln_hh(:,:,1), FFTW_ESTIMATE)
+    ! ! 2D complex to real transform: complex(Nx/2+1, 1) ----> double(Nx,1)
+    ! fftw_plan_bwd = fftw_plan_dft_c2r_2d(Nx,Ny, rhs_hat(:,:,1), soln_hh(:,:,1), FFTW_ESTIMATE)
+
+    fftw_plan_fwd = fftw_plan_dft_r2c_2d( Ny, Nx, rhs_poisson(:,:,1), rhs_hat(:,:,1), FFTW_ESTIMATE)
+
+    fftw_plan_bwd = fftw_plan_dft_c2r_2d( Ny, Nx, rhs_hat(:,:,1), soln_hh(:,:,1), FFTW_ESTIMATE)
 
 
 end subroutine init_fft

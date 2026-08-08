@@ -10,7 +10,7 @@ subroutine decide_dt
 
     cfl_buffer = -huge(0.0)
 
-    !$omp parallel default(none) &
+    !$omp parallel do default(none) collapse(3) &
     !$omp private(i, j, k) &
     !$omp shared(Nx, Ny, Nz, u, v, w, dx, dy, dz, nu, want_cfl,dt) &
     !$omp reduction(max:cfl_buffer)
@@ -28,7 +28,7 @@ subroutine decide_dt
             enddo
         enddo
     enddo
-    !$omp end parallel
+    !$omp end parallel do
 
     if (cfl_buffer .gt. 0.0 ) then
         dt = dt * want_cfl / cfl_buffer

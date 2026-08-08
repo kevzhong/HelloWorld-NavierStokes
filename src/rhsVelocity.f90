@@ -129,9 +129,11 @@ subroutine build_rhsVelocity
             ! ----- |            =  ----   |   vw    -   vw   | 
             !  dz   |i+1/2,j,k       dz    [    j+1        j  ] 
 
-            dvwdz = ( (w(i,j,k+1)+w(i-1,j,k+1))*(v(i,j,k+1)+v(i,j,k)) &
-                    -(w(i,j,k)+w(i-1,j,k))*(v(i,j,k)+v(i,j,k-1)) &
-                     ) / (4.0 * dz(k) ) 
+            dvwdz = ( (w(i,j,k+1) + w(i,j-1,k+1)) * &
+                       (v(i,j,k+1) + v(i,j,k))       &
+                      -(w(i,j,k)   + w(i,j-1,k))     * &
+                       (v(i,j,k)   + v(i,j,k-1))     &
+                     ) / (4.0 * dz(k))
 
             ! d2v / dxj2
             nudd2xy_v = nu *  ( ( v(i-1,j,k) -2.0*v(i,j,k) + v(i+1,j,k)  ) / dx**2  + &
@@ -150,10 +152,13 @@ subroutine build_rhsVelocity
             !  dz   |i,j,k+1/2       dz    [    k+1        k  ] 
 
 
-            dwwdz = 0.5*( dx*dy*w(i,j,k) + dx*dy*w(i,j,k+1) ) * 0.5 * ( w(i,j,k) + w(i,j,k+1) ) - & ! mww, k+1/2
-                    0.5*( dx*dy*w(i,j,k) + dx*dy*w(i,j,k-1) ) * 0.5 * ( w(i,j,k) + w(i,j,k-1) ) ! mww, k-1/2
-            
-            dwwdz = dwwdz / (dx * dy * dzmh )
+            !dwwdz = 0.5*( dx*dy*w(i,j,k) + dx*dy*w(i,j,k+1) ) * 0.5 * ( w(i,j,k) + w(i,j,k+1) ) - & ! mww, k+1/2
+            !        0.5*( dx*dy*w(i,j,k) + dx*dy*w(i,j,k-1) ) * 0.5 * ( w(i,j,k) + w(i,j,k-1) ) ! mww, k-1/2
+
+            !dwwdz = dwwdz / (dx * dy * dzmh )
+
+            dwwdz = ( 0.25*(w(i,j,k) + w(i,j,k+1))**2 - &
+                      0.25*(w(i,j,k) + w(i,j,k-1))**2 ) / dzmh
 
             ! d wu  |                1     [                  ]
             ! ----- |            =  ----   |   wu    -   wu   | 

@@ -6,34 +6,34 @@ module parameters
     implicit none
 
     ! Grid points
-    integer :: Nx = 128
+    integer :: Nx = 192
     integer :: Ny = 128
     integer :: Nz = 128
 
-    ! Domain size
-    real :: Lx = 1.0
-    real :: Ly = 1.0
-    real :: Lz = 1.0
+    ! ! Domain size
+    ! real :: Lx = 1.0
+    ! real :: Ly = 1.0
+    ! real :: Lz = 1.0
     
-    !real :: Lx = 2.0 * 3.141592653589793
-    !real :: Ly = 1.0 * 3.141592653589793
-    !real :: Lz = 2.0
+    real :: Lx = 2.0 * 3.141592653589793
+    real :: Ly = 1.0 * 3.141592653589793
+    real :: Lz = 2.0
 
     ! Time-stepping: Nt0, Nt can be optionally specified as command-line arguments
     integer :: Nt0 = 0 ! 0 for initial condition, /=0 for restart
-    integer :: Nt = 10 ! No. of timesteps
+    integer :: Nt = 60000 ! No. of timesteps
     real :: dt = 1.0e-4 ! Timestep
     
     logical :: cflmode = .true.
-    real :: want_cfl = 0.5
+    real :: want_cfl = 1.0
 
 
     ! Flow parameters
-    real :: nu = 1.0 / 1000.0
-    real :: mean_dpdx = 0.0
+    real :: nu = 1.0 / 180.0
+    real :: mean_dpdx = -1.0
 
     ! Grid stretching
-    ! UNIFORM , TANH, COSINE, ERF
+    ! UNIFORM , TANH, COSINE, ERF, NATURAL
     integer :: gridtype = TANH
     real :: str_coeff = 2.2
 
@@ -41,9 +41,12 @@ module parameters
     integer :: implicit_type = HELMHOLTZ ! ADI or HELMHOLTZ, ignored if implicitXYmode is false
 
     ! Add-ons
-    logical :: scalarmode = .true.
+    logical :: scalarmode = .false.
     real :: prandtl = 1.0
     real :: beta_gx = 0.0 ; real :: beta_gy = 0.0 ; real :: beta_gz = 1.0 ! buoyancy forcing
+
+
+    real :: time
 
 
     ! Wall boundary-conditions, DIRICHLET or NEUMANN(not implemented yet)
@@ -69,7 +72,8 @@ module parameters
     real :: bcval_Tbot = 1.0
 
     ! Data writing
-    integer :: tframe2d = 100
+    integer :: tframe2d = 1000
+    integer :: tstat = 1000
 
 end module parameters
 
@@ -162,3 +166,30 @@ module implicit
     real, allocatable, dimension(:,:,:) :: impl_delta
 
 end module implicit
+
+module stats
+    implicit none
+
+    ! Mean profiles
+    real, allocatable, dimension(:) :: uavg(:), vavg(:), wavg(:)
+    real, allocatable, dimension(:) :: cavg(:)
+
+    ! Second-order statistics
+    real, allocatable, dimension(:) :: uu_avg(:), vv_avg(:), ww_avg(:)
+    real, allocatable, dimension(:) :: uw_avg(:)
+    real, allocatable, dimension(:) :: cc_avg(:), cw_avg(:)
+
+    ! Integrated statistics
+    real :: uvolavg, tvolavg ! bulk velocities, temperatures
+    real :: nududz_bot, nududz_top ! Wall shear stress
+    real :: kapdTdz_bot, kapdTdz_top ! Wall heat fluxes
+
+
+    ! SPECTRA
+    
+
+
+
+    
+
+end module stats

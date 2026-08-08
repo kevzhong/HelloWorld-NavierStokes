@@ -4,10 +4,10 @@ import numpy as np
 from vtk import vtkXMLRectilinearGridWriter, vtkRectilinearGrid, vtkFloatArray
 from vtk.util.numpy_support import numpy_to_vtk
 
-tstart = 100
-tend = 10000
+tstart = 1000
+tend = 24000
 
-tskip = 100
+tskip = 1000
 
 #fields = ['c','u','w']
 fields = ['uxz']

@@ -82,6 +82,8 @@ subroutine projectionUpdate
 
     ! Additional Laplacian contribution from implicit treatment
     half_nualdt = 0.5 * nu * aldt
+
+    if (implicitXYmode) then
     !$omp parallel do &
     !$omp default(none) &
     !$omp private(i,j,k,dzmh,dzph) &
@@ -105,6 +107,29 @@ subroutine projectionUpdate
     enddo
     !$omp end parallel do
 
+else ! Only add z-implicit correction
+    !$omp parallel do &
+    !$omp default(none) &
+    !$omp private(i,j,k,dzmh,dzph) &
+    !$omp shared(p,pseudo_p,dx,dy,dz,Nx,Ny,Nz,dt,half_nualdt)
+    do k = 1,Nz
+        dzmh = 0.5*( dz(k-1) + dz(k  ) )
+        dzph = 0.5*( dz(k  ) + dz(k+1) )
+        do j = 1,Ny
+            do i = 1,Nx
+            p(i,j,k) = p(i,j,k) - half_nualdt * ( ( &
+                                                   ( pseudo_p(i,j,k+1) - pseudo_p(i,j,k  ) ) / dzph  - &
+                                                   ( pseudo_p(i,j,k  ) - pseudo_p(i,j,k-1) ) / dzmh      ) / dz(k)  )
+
+            enddo
+        enddo
+    enddo
+    !$omp end parallel do
+endif
+
+    call update_ghost_wallsU(u,bctype_ubot,bctype_utop,bcval_ubot,bcval_utop)
+    call update_ghost_wallsU(v,bctype_vbot,bctype_vtop,bcval_vbot,bcval_vtop)
+    call update_ghost_wallsW(w,bctype_wbot,bctype_wtop,bcval_wbot,bcval_wtop)
     call update_ghost_pressure(p)
 
 end subroutine projectionUpdate

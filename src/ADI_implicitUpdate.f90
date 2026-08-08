@@ -64,7 +64,7 @@ subroutine ADI_implicitUpdate
         if ( implicitXYmode .eqv. .true. ) then
             lapl_prefac = 0.5 * nu/prandtl * aldt / dx**2
             call ADI_periodicSolveX(lapl_prefac,rhs_temp)
-            lapl_prefac = 0.5 * nu * aldt / dy**2
+            lapl_prefac = 0.5 * nu/prandtl * aldt / dy**2
             call ADI_periodicSolveY(lapl_prefac)
             lapl_prefac = 0.5 * nu/prandtl * aldt 
             call implicit_wallSolve(lapl_prefac,impl_delta(:,:,:),temp(1:Nx,1:Ny,1:Nz),bctype_Tbot,bctype_Ttop)
@@ -411,9 +411,11 @@ subroutine implicit_wallSolve_W(half_nualdt,rhs,field,bc_type_bot,bc_type_top)
     enddo
 
     if (bc_type_bot .eq. DIRICHLET) then
-        dzmh = 0.5*( dz(0) + dz(1  ) )
-        ack(1) = ack(1) + half_nualdt / ( dz(k-1) * dzmh )
-        !apk(1) = -half_nualdt_on_dz2 * d_bcb ! Bottom wall Dirichlet
+        !dzmh = 0.5*( dz(0) + dz(1  ) )
+        !ack(1) = ack(1) + half_nualdt / ( dz(k-1) * dzmh )
+        !!apk(1) = -half_nualdt_on_dz2 * d_bcb ! Bottom wall Dirichlet
+
+        ack(1) = 1.0
     else
         ack(1) = 1.0 ! DUMMY TO AVOID WARNING
     endif
@@ -430,7 +432,7 @@ subroutine implicit_wallSolve_W(half_nualdt,rhs,field,bc_type_bot,bc_type_top)
     !$omp parallel do &
     !$omp default(none) &
     !$omp private(i,j,k,tdm_rhsZ_r) &
-    !$omp shared(Nx,Ny,Nz,rhs,field,amk,ack,apk)
+    !$omp shared(Nx,Ny,Nz,rhs,field,amk,ack,apk,bcval_wbot)
     do j = 1,Ny
         do i = 1,Nx
         
@@ -439,7 +441,8 @@ subroutine implicit_wallSolve_W(half_nualdt,rhs,field,bc_type_bot,bc_type_top)
                 tdm_rhsZ_r(k) = rhs(i,j,k) !* d
             enddo
             ! Boundary conditions
-            tdm_rhsZ_r(1) = ( rhs(i,j,1)  ) !* d_bcb
+            !tdm_rhsZ_r(1) = ( rhs(i,j,1)  ) !* d_bcb
+            tdm_rhsZ_r(1) = bcval_wbot - field(i,j,1) 
             tdm_rhsZ_r(Nz) = ( rhs(i,j,Nz) ) !* d_bct
 
 

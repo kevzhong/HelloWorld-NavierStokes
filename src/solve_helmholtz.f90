@@ -88,8 +88,9 @@ subroutine solve_helmholtz(field,rhs,p,q,bc_type_bot,bc_type_top)
             ! Arbitrary Dirichlet for 0 mode when considering pressure-Poisson
             if (bc_type_bot .eq. PRESSUREBC) then
                 if ((i .eq. 1) .and. (j .eq. 1)) then
-                    apk(1) = 0.0
+                    amk(1) = 0.0
                     ack(1) = 1.0
+                    apk(1) = 0.0
                     tdm_rhsZ_r(1) = 0.0
                     tdm_rhsZ_c(1) = 0.0
                 endif

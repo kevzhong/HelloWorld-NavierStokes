@@ -12,7 +12,7 @@ program main
     use velMemory
     implicit none
     integer :: i,nrk3
-    real :: time
+    !real :: time
     character(100) :: arg
 
     ! For timing
@@ -51,8 +51,9 @@ program main
     do i = nt0+1,nt
         call cpu_time(start_time)
 
+        if (cflmode) call decide_dt
+        
         do nrk3 = 1,3
-            if (cflmode) call decide_dt
             call next_rk3(nrk3)
             call updateFields
             call pressurePoisson ! Build div(ustar), solve Poisson, projection update to n+1
@@ -62,6 +63,7 @@ program main
         call cpu_time(end_time)
 
         ! call postpro
+        call bulk_stats
 
         time = time + dt
 
@@ -76,7 +78,10 @@ program main
             if (scalarmode ) call write2DField(temp(1:Nx,Ny/2,1:Nz),Nx,Nz,'cxz',i)
             
         endif
-        write(*,*) "Timestep ", i," CPU-time per step = ", end_time - start_time, "dt = ", dt
+
+        if ( mod(i,tstat) .eq. 0 ) call dump_profiles(i) ! Write statistics to ASCII files
+
+        write(*,*) "Timestep ", i," Wall-time per step = ", end_time - start_time, "dt = ", dt
 
     enddo
     !--------- End time-marching -------------------

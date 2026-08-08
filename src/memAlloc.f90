@@ -1,6 +1,7 @@
 ! Allocate memory arrays: fields and working memory arrays
 subroutine allocFields
     use parameters
+    use stats
     use ghost
     use velfields
     use velMemory
@@ -47,10 +48,29 @@ subroutine allocFields
         allocate( expl_c( 1:Nx , 1:Ny , 1:Nz ) ) ; allocate( expl_c_m1( 1:Nx , 1:Ny , 1:Nz ) ) 
     endif
 
+    ! Means
+    allocate( uavg(1:Nz) )
+    allocate( vavg(1:Nz) )
+    allocate( wavg(1:Nz) )
+
+    allocate( uu_avg(1:Nz) )
+    allocate( vv_avg(1:Nz) )
+    allocate( ww_avg(1:Nz) )
+    allocate( uw_avg(1:Nz) )
+
+    
+
+    if (scalarmode ) then
+        allocate( cavg(1:Nz) )
+        allocate( cc_avg(1:Nz) )
+        allocate( cw_avg(1:Nz) )
+    endif
+
 end subroutine allocFields
 
 
 subroutine deallocFields
+    use stats
     use velfields
     use velMemory
     use scalarfields
@@ -82,5 +102,13 @@ subroutine deallocFields
     if(allocated(temp)) deallocate(temp)
     if(allocated(rhs_temp)) deallocate(rhs_temp)
     if(allocated(expl_c)) deallocate(expl_c) ; if(allocated(expl_c_m1)) deallocate(expl_c_m1) 
+
+    if(allocated(uavg)) deallocate(uavg) ; if(allocated(vavg)) deallocate(vavg) ; if(allocated(wavg)) deallocate(wavg) 
+
+    if(allocated(uu_avg)) deallocate(uu_avg) ; if(allocated(vv_avg)) deallocate(vv_avg) ; if(allocated(ww_avg)) deallocate(ww_avg)
+    if(allocated(uw_avg)) deallocate(uw_avg)
+
+    if(allocated(cavg)) deallocate(cavg)
+    if(allocated(cc_avg)) deallocate(cc_avg) ; if(allocated(cw_avg)) deallocate(cw_avg)
 
 end subroutine deallocFields

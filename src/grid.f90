@@ -52,7 +52,6 @@ subroutine generate_grid
         
         case (ERF)
             call generate_erf_grid(dz,zc,zm,   Nz,halosize,Lz,str_coeff)
-            
     end select
 
 
